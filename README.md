@@ -62,6 +62,8 @@ This is because we need to authenticate our data poller! If we don't we are rest
 
 You will need set the OAUTHTOKEN environment variable on your computer to a predefined string.  I can't commit it to this repository because GitHub cleverly scans commits for Oauth tokens and revokes any token it finds. I guess I'll put the token somewhere on the google workspace we have.
 
+Alternatively, you can create your own Oauth access token
+
 
 ALSO: https://github.com/robashton/githubfall is a good example on how to grab data from github
 

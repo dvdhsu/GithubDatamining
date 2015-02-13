@@ -1,0 +1,3 @@
+#!/bin/bash
+url=http://127.0.0.1:2113/streams/"$1"
+curl -i -X DELETE $url -H "ES-HardDelete:true"

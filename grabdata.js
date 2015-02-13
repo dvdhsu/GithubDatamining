@@ -112,6 +112,9 @@ var processEvent = function(ev) {
 
 var processData = function(data) {
   var eventArray = JSON.parse(data);
+  if (eventArray.message){
+      return;
+  }
   for(var i = eventArray.length-1 ; i >= 0; i--) {
     processEvent(eventArray[i]);
   }
