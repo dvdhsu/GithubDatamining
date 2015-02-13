@@ -47,7 +47,7 @@ function toASCII(chars) {
 var fetchRepoInfo = function(name, cb) {
  var request = https.get({ host: 'api.github.com', path: '/repos/' + name, 
    headers: { 'User-Agent': 'Github-Dataminer' ,
-      "Authorization" : "token 3a48bfc3f49704a2aa13fb20db9ad5b9945a06ef "
+      "Authorization" : "token " + process.env.OAUTHTOKEN
    }}, function(res) {
     var data = '';
     res.on('data', function (chunk) {
@@ -60,26 +60,6 @@ var fetchRepoInfo = function(name, cb) {
     console.error(e);
   });
 };
-
-//var createDataFromPushEvent = function(data, cb) {
-  //fetchRepoInfo(data.repo.name, function(repo) {
-    //cb({
-      //language: repo.language,
-      //actor: data.actor,
-      //repo: data.repo,
-      //payload: data.payload
-    //});
-  //});
-//};
-
-//var eventHandlers = {
-  //"PushEvent": function(event) {
-    //createDataFromPushEvent(event, function(data) {
-      //eventQueue.push(data);
-    //});
-  //}
-//}
-//
 
 function pushEventIntoEventStore(ev){
   var sdf =JSON.stringify([
@@ -132,8 +112,6 @@ function pushEventIntoEventStore(ev){
 
 var processEvent = function(ev) {
   console.log('Processing event', ev.created_at, ':', ev.type);
-  pushEventIntoEventStore(ev);
-  return;
   if(ev.repo) {
     fetchRepoInfo(ev.repo.name, function(repo) {
       ev.repo = repo
@@ -167,7 +145,7 @@ var downloadEvents = function() {
     path: '/events',
     headers: { 
       'User-Agent': 'Github-Dataminer',
-      "Authorization" : "token 3a48bfc3f49704a2aa13fb20db9ad5b9945a06ef "
+      "Authorization" : "token " + process.env.OAUTHTOKEN
     }}, function(res) {
           var data = '';
           res.on('data', function (chunk) {
@@ -195,7 +173,7 @@ function authenticateMe(cb){
         "Content-Type": "application/json",
         "Content-Length": body.length,
         'User-Agent': 'Github-Dataminer',
-        "Authorization" : "token 3a48bfc3f49704a2aa13fb20db9ad5b9945a06ef "
+        "Authorization" : "token " + process.env.OAUTHTOKEN
       }
     }, function(res) {
       var data = '';
