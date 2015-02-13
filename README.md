@@ -2,6 +2,7 @@ Note, you will need to download EventStore which can be found here: https://gete
 
 Once you download the executables, copy the folder into ./EventStore. This means the directory structure will look roughly like
 
+```
 .. (up a dir)
 /GithubDatamining/ 
 |+db/ 
@@ -34,7 +35,7 @@ Once you download the executables, copy the folder into ./EventStore. This means
 |-package.json
 |-README.md
 `-startme.sh
-
+```
 
 Once you've got this set up, depending on whether you're using a mac or a pc, you can run the following command to start the database
 
