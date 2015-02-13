@@ -4,3 +4,5 @@ EventStore
 db
 logs
 node_modules
+bower_components
+nohup.out
