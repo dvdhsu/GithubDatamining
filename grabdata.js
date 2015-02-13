@@ -1,23 +1,4 @@
-
-
-var
-  http = require('http'),
-  https = require('https');
-
-var eventQueue = [];
-var timeUntilNextEvents = 10000;
-var last_created_at = new Date();
-var overlapped = false;
-
-var updateTimers = function() {
-  if(overlapped) {
-    timeUntilNextEvents += 1000;
-    overlapped = false;
-  } else {
-    timeUntilNextEvents -= 1000;
-  }
-}
-
+/* general functions */
 function guid() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
@@ -44,6 +25,24 @@ function toASCII(chars) {
     return ascii;
 }
 
+var
+  http = require('http'),
+  https = require('https');
+
+var timeUntilNextEvents = 10000;
+var last_created_at = new Date(); 
+var overlapped = false;
+
+var updateTimers = function() {
+  if(overlapped) {
+    timeUntilNextEvents += 1000;
+    overlapped = false;
+  } else {
+    timeUntilNextEvents -= 1000;
+  }
+}
+
+
 var fetchRepoInfo = function(name, cb) {
  var request = https.get({ host: 'api.github.com', path: '/repos/' + name, 
    headers: { 'User-Agent': 'Github-Dataminer' ,
@@ -61,19 +60,7 @@ var fetchRepoInfo = function(name, cb) {
   });
 };
 
-function pushEventIntoEventStore(ev){
-  var sdf =JSON.stringify([
-  {
-    "eventId": "fbf4a1a1-b4a3-4dfe-a01f-ec52c34e16e4",
-    "eventType": "event-type",
-    "data": {
-
-      "a": "1"
-    }
-  }
-]);
-  //ev.eventType = ev.type;
-  //ev.eventId = ev.id;
+var pushEventIntoEventStore = function(ev){
   var body = toASCII(JSON.stringify([{
     eventId: guid(),
     eventType: ev.type,
@@ -87,8 +74,8 @@ function pushEventIntoEventStore(ev){
       headers: {
         "Content-Type": "application/vnd.eventstore.events+json; charset=utf-8",
         "Content-Length": body.length,
-        "ES-EventType" : ev.type,
-        "ES-EventId" : guid() 
+        "ES-EventType" : ev.type, //May be redundant?
+        "ES-EventId" : guid()  //May be redundant?
       }
   }, function(res) {
       var data = '';
@@ -107,12 +94,12 @@ function pushEventIntoEventStore(ev){
 
 var processEvent = function(ev) {
   console.log('Processing event', ev.created_at, ':', ev.type);
-  if(event.created_at < last_created_at) {
-    console.log('Skipping event', event.created_at);
+  if(ev.created_at < last_created_at) {
+    console.log('Skipping event', ev.created_at);
     overlapped = true;
     return;
   }
-  last_created_at = event.created_at;
+  last_created_at = ev.created_at;
   if(ev.repo) {
     fetchRepoInfo(ev.repo.name, function(repo) {
       ev.repo = repo
@@ -155,7 +142,7 @@ var downloadEvents = function() {
   console.log('Waiting ' + timeUntilNextEvents + ' until reading API again');
 };
 
-function authenticateMe(cb){
+var authenticateMe = function(cb){
   var body ="";
   var req = https.request({
       host: "api.github.com",
