@@ -131,7 +131,7 @@ var processData = function(data) {
   for(var i = eventArray.length-1 ; i >= 0; i--) {
     processEvent(eventArray[i]);
   }
-  updateTimers();
+  //updateTimers();
 };
 
 var downloadEvents = function() {
