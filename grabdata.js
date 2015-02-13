@@ -9,14 +9,14 @@ var timeUntilNextEvents = 10000;
 var last_created_at = new Date();
 var overlapped = false;
 
-var updateTimers = function() {
-  if(overlapped) {
-    timeUntilNextEvents += 1000;
-    overlapped = false;
-  } else {
-    timeUntilNextEvents -= 1000;
-  }
-}
+//var updateTimers = function() {
+  //if(overlapped) {
+    //timeUntilNextEvents += 1000;
+    //overlapped = false;
+  //} else {
+    //timeUntilNextEvents -= 1000;
+  //}
+//}
 
 function guid() {
   function s4() {
@@ -96,11 +96,6 @@ function pushEventIntoEventStore(ev){
         data += chunk;
       });
       res.on('end', function() {
-        console.log('YAY');
-        console.log(data);
-        console.log(data.length);
-        console.log(body.length);
-        console.log(body);
         console.log(res.headers);
       });
     // Handle this
