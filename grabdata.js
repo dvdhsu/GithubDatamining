@@ -9,14 +9,14 @@ var timeUntilNextEvents = 10000;
 var last_created_at = new Date();
 var overlapped = false;
 
-//var updateTimers = function() {
-  //if(overlapped) {
-    //timeUntilNextEvents += 1000;
-    //overlapped = false;
-  //} else {
-    //timeUntilNextEvents -= 1000;
-  //}
-//}
+var updateTimers = function() {
+  if(overlapped) {
+    timeUntilNextEvents += 1000;
+    overlapped = false;
+  } else {
+    timeUntilNextEvents -= 1000;
+  }
+}
 
 function guid() {
   function s4() {
@@ -107,6 +107,12 @@ function pushEventIntoEventStore(ev){
 
 var processEvent = function(ev) {
   console.log('Processing event', ev.created_at, ':', ev.type);
+  if(event.created_at < last_created_at) {
+    console.log('Skipping event', event.created_at);
+    overlapped = true;
+    return;
+  }
+  last_created_at = event.created_at;
   if(ev.repo) {
     fetchRepoInfo(ev.repo.name, function(repo) {
       ev.repo = repo
@@ -115,15 +121,6 @@ var processEvent = function(ev) {
   } else {
     pushEventIntoEventStore(ev)
   }
-  //if(event.created_at < last_created_at) {
-    //console.log('Skipping event', event.created_at);
-    //overlapped = true;
-    //return;
-  //}
-  //last_created_at = event.created_at;
-  //var handler = eventHandlers[event.type];
-  //if(!handler) return;
-  //handler(event);
 };
 
 var processData = function(data) {
@@ -131,7 +128,7 @@ var processData = function(data) {
   for(var i = eventArray.length-1 ; i >= 0; i--) {
     processEvent(eventArray[i]);
   }
-  //updateTimers();
+  updateTimers();
 };
 
 var downloadEvents = function() {
@@ -147,6 +144,7 @@ var downloadEvents = function() {
             data += chunk;
           });
           res.on('end', function() {
+            console.log(data);
             processData(data);
           });
         }).on('error', function(e) {
