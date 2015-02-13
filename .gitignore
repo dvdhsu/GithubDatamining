@@ -1,3 +1,6 @@
 *swp
 *~
 EventStore
+db
+logs
+node_modules

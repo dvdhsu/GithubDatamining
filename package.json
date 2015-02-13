@@ -1,0 +1,19 @@
+{
+  "name": "GithubDatamining",
+  "version": "1.0.0",
+  "description": "data mines github!",
+  "main": "grabdata.js",
+  "scripts": {
+    "test": "echo \"NOT WORKING\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jacqt/GithubDatamining.git"
+  },
+  "author": "Anthony",
+  "license": "IDK",
+  "bugs": {
+    "url": "https://github.com/jacqt/GithubDatamining/issues"
+  },
+  "homepage": "https://github.com/jacqt/GithubDatamining"
+}
