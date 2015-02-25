@@ -1,3 +1,14 @@
+Github Datamining
+=================
+
+
+General structure
+-----------------
+
+We have two database systems. One is MongoDb, and the other is EventStore.  We push all our data into MongoDb first, and then when we want to perform analytics, we can run an application that reads data from MongoDB and pushes it into EventStore. By using eventstore projections, it is easy to do temporal queries.
+
+
+
 Note, you will need to download EventStore which can be found here: https://geteventstore.com/downloads/
 
 Once you download the executables, copy the folder into ./EventStore. This means the directory structure will look roughly like
