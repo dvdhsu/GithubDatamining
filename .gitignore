@@ -2,7 +2,9 @@
 *~
 EventStore
 db
+db-backup
 logs
 node_modules
 bower_components
 nohup.out
+data
