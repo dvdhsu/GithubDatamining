@@ -20,11 +20,11 @@ function AddListener(callback){
     callbacks.push(callback);
 }
 
-function DownloadEvents(){
+function StartPolling(){
     client.get('/events', function(err, status, body, headers){
         if (err != null){
             console.log(err);
-            setTimeout(DownloadEvents, 60*1000); // Wait a minute before trying again
+            setTimeout(StartPolling, 60*1000); // Wait a minute before trying again
         } else {
             console.log('Polls remaining: ' + headers['x-ratelimit-remaining']);
             body.map(ProcessEvent);
@@ -37,8 +37,8 @@ function DownloadEvents(){
             //We should use below...
             var next_poll_time = parseInt(headers['x-poll-interval']) * 1000;
             //But because we don't care about github's request to not poll so much
-            next_poll_time = 30*1000 //30 seconds
-            setTimeout(DownloadEvents, next_poll_time)
+            next_poll_time = 30*1000 //We poll every 30 seconds. Ha!
+            setTimeout(StartPolling, next_poll_time)
         }
     });
 }
@@ -46,7 +46,6 @@ function DownloadEvents(){
 function ProcessEvent(ev){
     console.log('Processing event', ev.created_at, ':', ev.type);
     if (ev.id in processed_events){
-        console.log('DUPLICATE EVENT');
         return;
     } else {
         processed_events[ev.id] = true;
@@ -57,24 +56,13 @@ function ProcessEvent(ev){
 }
 
 //We don't use this right now
-function fetchRepoInfo(name, cb) {
-    var request = https.get({
-        host: 'api.github.com',
-        path: '/repos/' + name,
-        headers: {
-            'User-Agent': 'Github-Dataminer',
-            "Authorization": "token " + process.env.OAUTHTOKEN
+function GetRepo(name, cb) {
+    client.get('/repos/ + name', function(err, status, body, headers){
+        if (err){
+            console.log(err);
+        } else {
+            cb(body);
         }
-    }, function(res) {
-        var data = '';
-        res.on('data', function(chunk) {
-            data += chunk;
-        });
-        res.on('end', function() {
-            cb(JSON.parse(data));
-        });
-    }).on('error', function(e) {
-        console.error(e);
     });
 };
 
@@ -83,5 +71,8 @@ module.exports = {
     AddListener: AddListener,
 
     //Starts polling github for data
-    StartPolling : DownloadEvents
+    StartPolling : StartPolling,
+
+    //Gets a repository via the GitHub api
+    GetRepo: GetRepo
 }

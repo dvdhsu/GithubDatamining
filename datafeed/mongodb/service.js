@@ -17,7 +17,7 @@ function ProcessEvent(ev){
         if (err){
             console.log(err);
         } else {
-            console.log('Succeeded in pushing data into mongodb');
+            //console.log('Succeeded in pushing data into mongodb');
         }
     });
 }
@@ -27,11 +27,30 @@ function GetEventStream(){
     return events.find({}, { stream: true, sort: { created_at: 1} });
 }
 
+function GetRepo(repo_id){
+    var repos = db.get('repos');
+    return repos.findOne({_id: repo_id}, {});
+}
+
+function InsertRepo(repo){
+    var repos = db.get('repos');
+    repos.insert(repo, function(err, doc){
+        if (err){
+            console.log(err);
+        } else {
+            //console.log('Succeeded in adding repository!');
+        }
+    })
+}
+
 module.exports = {
     //Processes an event and pushes it to our mongodb database
     ProcessEvent: ProcessEvent,
 
     //Returns a promise object that can be iterated on for each event
     // using the syntax GetEventStream().each(function(...))
-    GetEventStream: GetEventStream
+    GetEventStream: GetEventStream,
+
+    //Inserts a repository into the repos database
+    InsertRepo: InsertRepo
 }
