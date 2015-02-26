@@ -16,12 +16,23 @@ var ghme = client.me();
 var processed_events = {}; //tacky way of ensuring no duplicates. Technically a memory leak :o FIXME
 
 var callbacks = []; //callbacks registered
+
+var GLOBAL_HEADERS = null;
+
+function log_state(){
+    if (GLOBAL_HEADERS){
+        console.log('Polls remaining: ' + GLOBAL_HEADERS['x-ratelimit-remaining']);
+    }
+    setTimeout(log_state, 20000);
+}
+
 function AddListener(callback){
     callbacks.push(callback);
 }
 
 function StartPolling(){
     client.get('/events', function(err, status, body, headers){
+        GLOBAL_HEADERS = headers;
         if (err != null){
             console.log(err);
             setTimeout(StartPolling, 60*1000); // Wait a minute before trying again
@@ -57,15 +68,18 @@ function ProcessEvent(ev){
 
 //We don't use this right now
 function GetRepo(name, cb) {
-    client.get('/repos/ + name', function(err, status, body, headers){
+    client.get('/repos/' + name, function(err, status, body, headers){
+        GLOBAL_HEADERS = headers;
         if (err){
-            console.log(err);
+            cb(null);
         } else {
+            console.log('Polls remaining: ' + headers['x-ratelimit-remaining']);
             cb(body);
         }
     });
 };
 
+log_state();
 module.exports = {
     //Adds a callback that will be called whenever new data is received from github 
     AddListener: AddListener,

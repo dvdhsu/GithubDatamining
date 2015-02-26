@@ -22,14 +22,61 @@ function ProcessEvent(ev){
     });
 }
 
+function SetIndexes(){
+    var events = db.get('events');
+    events.index('created_at _id');
+}
+
+
 function GetEventStream(){
     var events = db.get('events');
     return events.find({}, { stream: true, sort: { created_at: 1} });
 }
 
+function GetEventPageIterator(page_size){
+    var events = db.get('events');
+    var last_id = null;
+    var hasNext = true;
+    return {
+        getNext: function(){
+            //console.log('GETTING NEXT: ' + page_size);
+            if (last_id == null){
+                //First page
+                var promise = events.find({}, {limit: page_size, sort: {created_at: 1, _id: 1}});
+                promise.on('success', function(docs){
+                    var last_doc = docs[docs.length-1];
+                    last_id = last_doc._id;
+                });
+                return promise;
+            } else {
+                var promise = events.find({_id: { $gt : last_id } }, {limit: page_size, sort: {created_at: 1, _id: 1}});
+                promise.on('success', function(docs){
+                    var last_doc = docs[docs.length-1];
+                    if (last_doc){
+                        last_id = last_doc._id;
+                    }  else {
+                        hasNext = false;
+
+                    }
+                });
+                return promise;
+            }
+        },
+        hasNext: function(){
+            return hasNext;
+        }
+    }
+}
+
+
 function GetRepo(repo_id){
     var repos = db.get('repos');
     return repos.findOne({_id: repo_id}, {});
+}
+
+function GetRepos(repo_id_list){
+    var repos = db.get('repos');
+    return repos.find({_id: { $in: repo_id_list}}, {});
 }
 
 function InsertRepo(repo){
@@ -43,6 +90,8 @@ function InsertRepo(repo){
     })
 }
 
+SetIndexes();
+
 module.exports = {
     //Processes an event and pushes it to our mongodb database
     ProcessEvent: ProcessEvent,
@@ -50,6 +99,15 @@ module.exports = {
     //Returns a promise object that can be iterated on for each event
     // using the syntax GetEventStream().each(function(...))
     GetEventStream: GetEventStream,
+
+    //Returns an object that iterates through pages of events
+    GetEventPageIterator: GetEventPageIterator,
+
+    //Gets a repository
+    GetRepo : GetRepo,
+
+    //Gets a list of repositories
+    GetRepos: GetRepos,
 
     //Inserts a repository into the repos database
     InsertRepo: InsertRepo
