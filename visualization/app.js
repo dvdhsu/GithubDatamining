@@ -1,30 +1,32 @@
-/** Anthony Guo (anthony.guo@some.ox.ac.uk)
- *
- * Describes the angular controllers/services and their dependencies
- */
-
-angular.module('githubviz', [
-    'githubviz.controllers',
-    'githubviz.services',
-    'chartsExample.directives'
-]);
+/** Server backend for the website
+*/
 
 
-angular.module('githubviz.controllers', [ 
-    //add dependencies for the controllers here
-]);
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
-angular.module('githubviz.services', [
-    //add dependencies for the services here
-]);
+var WebsocketHandler = require('./app/websocket/handler.js');
 
-/**
- * Controls the entire app. Named "GithubViz".
- */
-(function(){
-    angular.module('githubviz.controllers').controller('GithubViz',
-        ['$scope', controller]);
-    function controller ($scope, $modal) {
-        $scope.datum = "Hello world!";
-    }
-})();
+var RealTime = require('./app/realtime/data.js');
+
+RealTime.AddTickHandler(function(data){
+    //broadcast the data to everybody
+    io.emit('realtime_data', data)
+})
+
+//socket.io routing
+io.on('connection', function(socket){
+    console.log('a user connected');
+    WebsocketHandler.HandleSocket(socket);
+});
+
+//Serve static content from the  ./www directory
+app.use(express.static('www'))
+
+var server = http.listen(2000, function () {
+    var host = server.address().address
+    var port = server.address().port
+    console.log('Example app listening at http://%s:%s', host, port)
+})

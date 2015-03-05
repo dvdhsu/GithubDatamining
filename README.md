@@ -7,6 +7,7 @@ General structure
 
 We have two database systems. One is MongoDb, and the other is EventStore.  We push all our data into MongoDb first, and then when we want to perform analytics, we can run an application that reads data from MongoDB and pushes it into EventStore. By using eventstore projections, it is easy to do temporal queries.
 
+Side note: Sadly, it turns out the blog post I linked is written by a total incompetent. The % of commits with swear words is far far lower than reported, with JS only having a swear rate of 0.12%.
 
 
 Note, you will need to download EventStore which can be found here: https://geteventstore.com/downloads/

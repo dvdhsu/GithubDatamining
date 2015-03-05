@@ -5,6 +5,18 @@
 
     <!-- ANGULAR -->
     <script src="bower_components/angular/angular.js"></script>
+    
+    <!--ANGULAR CHARTS + CHARTS.JS-->
+    <script src="bower_components/Chart.js/chart.js"></script>
+    <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
+    <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
+
+    <!-- MOMENT TIME LIBRARY -->
+    <script src="./bower_components/moment/moment.js"></script>
+
+    <!-- SOCKET.IO -->
+    <script src="/bower_components/socket.io-client/socket.io.js"></script>
+
 
     <!--HIGHCHARTS -->
     <script src="bower_components/highcharts-release/highcharts-all.js"></script>
@@ -15,13 +27,20 @@
 
     <!-- UTILITY SCRIPTS -->
     <script src="app/util/net/event_store_service.js"></script>
+    <script src="app/util/net/socketio.js"></script>
     <script src="app/util/test/testController.js"></script>
 
+    <!--REALTIME CONTROLLER-->
+    <script src="app/realtime/service.js"></script>
+    <script src="app/realtime/ctrl.js"></script>
 
   </head>
   <body ng-controller="GithubViz">
+  <h1> Github Visualizations </h1>
+    <div ng-controller="RealTimeController"
+         ng-include="'app/realtime/main.html'">
+    </div>
     <div ng-controller="TestController"
-         ng-show="in_dev_mode"
          ng-include="'app/util/test/main.html'">
     </div>
   </body>

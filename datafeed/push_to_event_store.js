@@ -1,8 +1,12 @@
+/*Anthony Guo (anthony.guo@some.ox.ac.uk)
+ * Pushes data from mongodb to event store
+ */
+
 var MongoService = require('./mongodb/service.js')
 var EventStoreService = require('./eventstore/service.js');
 
 var BATCH_SIZE = 1000;
-var PAGE_SIZE = 1000;
+var PAGE_SIZE = 2000;
 var EventIterator = MongoService.GetEventPageIterator(PAGE_SIZE);
 var queue = []
 
@@ -40,48 +44,24 @@ function ProcessQueue(){
         var promise = MongoService.GetRepos(repo_ids);
         promise.success(function(docs){
             console.log("pushing " + BATCH_SIZE + " events into eventstore");
+            console.log(docs.length);
             for (var i = 0; i != docs.length; ++i){
                 var repo = docs[i];
+                var found_repo = false;
                 for (var j = 0; j != events.length; ++j){
-                    if (events[j].repo && events[j].repo.id == repo.id){
-                        events[j].repo = repo;
-                        break;
+                    if (events[j].repo && parseInt(events[j].repo.id) == repo._id){
+                        events[j].repo.language = repo.language;
                     }
                 }
             }
             EventStoreService.ProcessEvents(events);
             setTimeout(ProcessQueue, 100);
         });
-        //function process_event(){
-            //var length = JSON.stringify(events).length;
-            //if (i >= BATCH_SIZE){
-                //EventStoreService.ProcessEvents(events);
-                //setTimeout(ProcessQueue, 100);
-                //return;
-            //}
-            //++i;
-            //var obj = queue.shift();
-            //var ev = obj.doc;
-            //console.log(obj.doc.created_at + ': processing');
-            //if (ev.repo){
-                //var p = MongoService.GetRepo(parseInt(ev.repo.id))
-                //p.success(function(doc){
-                    //if (doc != null){
-                        //ev.repo = doc;
-                    //}
-                    //events.push(ev);
-                    //process_event();
-                //});
-            //} else {
-                //events.push(ev);
-                //process_event();
-            //}
-        //}
-        //process_event();
     } else {
         setTimeout(ProcessQueue, 100);
     }
-
 }
 
+ProcessPage();
+ProcessQueue();
 ProcessQueue();

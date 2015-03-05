@@ -19,6 +19,14 @@ var callbacks = []; //callbacks registered
 
 var GLOBAL_HEADERS = null;
 
+function PollsRemaining (){
+    if (GLOBAL_HEADERS){
+        return parseInt(GLOBAL_HEADERS['x-ratelimit-remaining']);
+    } else {
+        return -1;
+    }
+};
+
 function log_state(){
     if (GLOBAL_HEADERS){
         console.log('Polls remaining: ' + GLOBAL_HEADERS['x-ratelimit-remaining']);
@@ -37,7 +45,7 @@ function StartPolling(){
             console.log(err);
             setTimeout(StartPolling, 60*1000); // Wait a minute before trying again
         } else {
-            console.log('Polls remaining: ' + headers['x-ratelimit-remaining']);
+            //console.log('Polls remaining: ' + headers['x-ratelimit-remaining']);
             body.map(ProcessEvent);
             for (var p = 2; p <= 10; ++p){
                 client.get('/events', { page: p }, function(err, status, body, headers){
@@ -69,17 +77,23 @@ function ProcessEvent(ev){
 //We don't use this right now
 function GetRepo(name, cb) {
     client.get('/repos/' + name, function(err, status, body, headers){
-        GLOBAL_HEADERS = headers;
+        if (headers){
+            GLOBAL_HEADERS = headers;
+        }
         if (err){
-            cb(null);
+            if (err.message == 'Not Found'){
+                cb('Not Found');
+            } else {
+                cb('Undefined');
+            }
         } else {
-            console.log('Polls remaining: ' + headers['x-ratelimit-remaining']);
+            //console.log('Polls remaining: ' + headers['x-ratelimit-remaining']);
             cb(body);
         }
     });
 };
 
-log_state();
+//log_state();
 module.exports = {
     //Adds a callback that will be called whenever new data is received from github 
     AddListener: AddListener,
@@ -88,5 +102,7 @@ module.exports = {
     StartPolling : StartPolling,
 
     //Gets a repository via the GitHub api
-    GetRepo: GetRepo
+    GetRepo: GetRepo,
+
+    PollsRemaining: PollsRemaining
 }

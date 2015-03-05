@@ -29,7 +29,7 @@
         }
 
         $scope.getData = function(){
-            var req = EventStoreService.getProjectionState("QUERY_swear");
+            var req = EventStoreService.GetProjectionState("QUERY_swear");
             req.success(function(data, status, headers, config){
                 console.log('successfully got data');
                 $scope.data = data;

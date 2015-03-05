@@ -1,0 +1,14 @@
+<h2> Real time data </h2>
+
+<div>
+  <pre>
+  <!--{{ get_json_events() }}-->
+  </pre>
+
+  <canvas width="500px" id="line" class="chart chart-line" data="data.chart.data"
+    labels="data.chart.labels" legend="true" series="data.chart.series"
+    options="options"
+    click="onClick">
+  </canvas>  
+  <button ng-click ="refresh()">refresh</button>
+</div>

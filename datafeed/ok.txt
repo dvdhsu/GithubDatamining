@@ -1,0 +1,23 @@
+db.events.find({
+    created_at: { 
+        $gte: '2015-02-26T02:31:27Z', 
+        $lte: '2015-02-26T02:38:56Z'
+    }
+}).sort({_id: 1}).forEach(function(ev){
+	if (ev.repo){
+        var cursor = db.repos.find({
+            _id: ev.repo.id
+        });
+        if (cursor.hasNext()){
+            var repo = cursor.next();
+            print(repo._id);
+        }
+	}
+});
+
+
+            if (repo._id){
+                db.repos.remove({
+                    _id: repo._id
+                }, {justOne: true})
+            }
