@@ -11,6 +11,7 @@
         console.log('Realtime service executed');
         var WIDTH = 2;
         var DATA_LENGTH = WIDTH*60;
+        var IGNORED_EVENTS = ["MemberEvent", "PullRequestReviewCommentEvent", "GollumEvent", "CommitCommentEvent", "IssueCommentEvent", "PublicEvent", "ReleaseEvent", "DeleteEvent" ];
         var LABEL_INTERVAL = WIDTH;
         var c = 0;
 
@@ -28,7 +29,6 @@
         SocketIOService.AddHandler('realtime_data', function(events){
             _data.events = _data.events.concat(events);
              
-
             var chart = _data.chart;
             chart.data.map(function(d){
                 d.push(0);
@@ -50,9 +50,9 @@
                 var event = events[i];
                 var index = chart.series.indexOf(event.type);
                 if (index == -1){
-                    //if (chart.data.length > 5){
-                        //continue;
-                    //}
+                    if (IGNORED_EVENTS.indexOf(event.type) > -1){
+                        continue;
+                    }
                     chart.series.push(event.type)
                     var d = [];
                     for (var j = 0; j != DATA_LENGTH; ++j){
@@ -63,6 +63,7 @@
                 }
                 chart.data[index][chart.data[index].length-1] += 1;
             }
+
 
 
             for (var i = 0; i != _callbacks.length; ++i){

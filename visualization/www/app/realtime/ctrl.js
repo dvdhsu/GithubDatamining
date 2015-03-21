@@ -10,17 +10,33 @@
             $scope.data = RealTimeService.Data;
 
             $scope.options = {
+                datasetStroke: false,
                 animation: false,
                 pointDot: false,
-            }
+                showTooltips: false,
+                scaleShowVerticalLines: false,
+                scaleLabel: function (valuePayload) {
+                    return Number(valuePayload.value) + ' events'
+                }
+            };
 
             $scope.get_json_events = function(){
                 return JSON.stringify($scope.data.events, undefined, 2);
             }
 
+            var update = 0;
             RealTimeService.AddDataHandler(function(){
-                $scope.$apply();
-            });
+                update += 1;
+            })
+            function UpdateLoop(){
+                if (update > 0){
+                    $scope.$apply();
+                }
+                update = 0;
+                setTimeout(UpdateLoop, 30);
+            }
+            UpdateLoop();
+
             function SyntaxHighlight(json) {
                 if (typeof json != 'string') {
                 }

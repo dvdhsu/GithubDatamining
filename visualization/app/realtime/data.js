@@ -38,23 +38,24 @@ function EmitTick(events){
 
 
 function StartTicking(){
-    if (queue.length < 1000){
+    if (queue.length < 20000){
         ProcessPage();
     } else {
         var events = [];
         var ev = queue.shift();
         var first_time = moment(ev.created_at);
         console.log(first_time.format('DD:hh:mm:ss'));
-        while (!ev || !ev.created_at){
-            ev = queue.shift();
-        }
-        while (moment(ev.created_at).diff(first_time, 'seconds') < 1){
+        //while (moment(ev.created_at).diff(first_time, 'seconds') < 1){
+        while (moment(ev.created_at).diff(first_time) < 1000){
             events.push(ev);
             ev = queue.shift();
+            while (!ev || !ev.created_at){
+                ev = queue.shift();
+            }
         }
         EmitTick(events);
     }
-    setTimeout(StartTicking, 900);
+    setTimeout(StartTicking, 1000);
 }
 
 

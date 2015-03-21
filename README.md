@@ -1,5 +1,46 @@
-Github Datamining
-=================
+# Github Datamining
+
+## Technology Used
+
+### Downloading and Storing Data
+
+This part has roughly been completely figured out and it is possible to grab every public event in real time
+
+#### NodeJS
+ - octonode wrapper around Github's API
+ - monk wrapper around mongodb's driver
+ - mongodb driver to interface with MongoDB
+
+#### MongoDB:
+ - A webscale schemaless database that makes it trivial to insert data pulled from Github into the database
+
+#### EventStore
+ - A write-once read many database that is optimized for event streams and creating projections on data
+
+
+### Processing Data
+
+The line here is slightly blurred with the storage of data.
+
+Since we have a database for our data, we could use any language + library combination to process the data. I suspect that it may be easiest to use NodeJS due to the schemaless nature of MongoDB. 
+
+In the unlikely case we create perforance reliant metrics, we can switch to another language
+
+#### EventStore
+ - A write-once read many database that is optimized for event streams and creating projections on data
+ - Nothing really special about this other than it's faster and easier to use this than to reimplement this type of querying projection on top of MongoDB
+
+
+### Presenting Data
+
+#### AngularJS
+ - A MVVM JS framework for building web applications
+
+#### Chart.js
+ - A useful javascript chart drawing library
+
+#### Highcharts
+ - Another possible javascript chart drawing library
 
 
 General structure
