@@ -49,7 +49,9 @@ function StartPolling(){
             body.map(ProcessEvent);
             for (var p = 2; p <= 10; ++p){
                 client.get('/events', { page: p }, function(err, status, body, headers){
-                    body.map(ProcessEvent);
+                    if(body){
+                        body.map(ProcessEvent);
+                    }
                 });
             }
 

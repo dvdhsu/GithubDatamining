@@ -8,7 +8,7 @@
     // is triggered, all registered callbacks are invoked.
     angular.module('githubviz.services').factory('SocketIOService',
     [function() {
-        var _socket = io('http://localhost:2000');
+        var _socket = io(':2000/');
         console.log(_socket);
         function AddHandler(event_name, callback){
             _socket.on(event_name, callback);

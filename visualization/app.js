@@ -16,6 +16,8 @@ RealTime.AddTickHandler(function(data){
     io.emit('realtime_data', data)
 })
 
+console.log(io);
+
 //socket.io routing
 io.on('connection', function(socket){
     console.log('a user connected');
