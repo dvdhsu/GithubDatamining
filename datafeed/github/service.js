@@ -95,6 +95,58 @@ function GetRepo(name, cb) {
     });
 };
 
+
+function GetTopUsers(){
+  MIN_FOLLOWERS = 255;
+  MAX_PAGES = 10;
+  ghsearch = client.search();
+  for (var p = 1; p <= 10; ++p){
+      client.get('/events', { page: p }, function(err, status, body, headers){
+          if(body){
+              body.map(ProcessEvent);
+          }
+      });
+  }
+  ghsearch.users({
+    q: 'followers:>' + MIN_FOLLOWERS,
+    sort: 'followers',
+    order: 'desc'
+  }, function (err, status, body, headers){
+    console.log(err);
+    console.log(status);
+    console.log(body);
+  });
+}
+
+function GetTopRepos(cb){
+  MIN_STARS = 500;
+  var ghsearch = client.search();
+  for (var page = 1; page <= 10; ++page){
+    ghsearch.repos({
+      page: page,
+      per_page: 100,
+      q: 'stars:>' + MIN_STARS,
+      sort: 'stars',
+      order: 'desc'
+    }, function (err, body){
+      var repos = body.items;
+      var processed_repos = 0;
+      repos.map(function(repo){
+        var contrib_url = repo.contributors_url;
+        var ghrepo = client.repo(repo.full_name);
+        ghrepo.contributors(function(err, body, headers){
+          repo.contributors = body;
+          processed_repos += 1;
+          if (processed_repos == repos.length){
+            cb(repos);
+          }
+        });
+      });
+    });
+  }
+
+}
+
 //log_state();
 module.exports = {
     //Adds a callback that will be called whenever new data is received from github 
@@ -106,5 +158,10 @@ module.exports = {
     //Gets a repository via the GitHub api
     GetRepo: GetRepo,
 
+    GetTopUsers: GetTopUsers,
+
+    GetTopRepos: GetTopRepos,
+
     PollsRemaining: PollsRemaining
+
 }

@@ -14,9 +14,14 @@
             _socket.on(event_name, callback);
         }
 
+        function Emit(event_name, data){
+          _socket.emit(event_name, data);
+        }
+
         return {
             // Gets a http object that will hold the state of the projection corresponding to the name passed in
             AddHandler: AddHandler,
+            Emit: Emit
         }
     }]);
 })();

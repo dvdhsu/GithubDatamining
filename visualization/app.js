@@ -9,12 +9,13 @@ var io = require('socket.io')(http);
 
 var WebsocketHandler = require('./app/websocket/handler.js');
 
-var RealTime = require('./app/realtime/data.js');
+var MongoService = require('./app/mongodb/service.js');
 
-RealTime.AddTickHandler(function(data){
-    //broadcast the data to everybody
-    io.emit('realtime_data', data)
-})
+//var RealTime = require('./app/realtime/data.js');
+//RealTime.AddTickHandler(function(data){
+    ////broadcast the data to everybody
+    //io.emit('realtime_data', data)
+//})
 
 console.log(io);
 
@@ -22,6 +23,12 @@ console.log(io);
 io.on('connection', function(socket){
     console.log('a user connected');
     WebsocketHandler.HandleSocket(socket);
+    socket.on('toprepos', function(){
+      var promise = MongoService.GetAllRepos();
+      promise.success(function(docs){
+        socket.emit('toprepos', docs.slice(0,150));
+      });
+    })
 });
 
 //Serve static content from the  ./www directory

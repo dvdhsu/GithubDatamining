@@ -7,5 +7,14 @@ var GithubService = require('./github/service.js');
 var MongoService = require('./mongodb/service.js')
 
 //Add a listener to push all events into our mongodb database
-GithubService.AddListener(MongoService.ProcessEvent);
-GithubService.StartPolling();
+//GithubService.AddListener(MongoService.ProcessEvent);
+//GithubService.StartPolling();
+GithubService.GetTopRepos(function(repos){
+  console.log('processing ' + repos.length);
+  repos.map(function(repo){
+    repo.contributors = repo.contributors.map(function(contributor){
+      return contributor.id;
+    });
+    MongoService.InsertRepo(repo);
+  });
+});

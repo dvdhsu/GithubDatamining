@@ -6,7 +6,9 @@
 angular.module('githubviz', [
     'githubviz.controllers',
     'githubviz.services',
-    'chartsExample.directives'
+    'chartsExample.directives',
+    'uiSlider',
+    'monospaced.mousewheel'
 ]);
 
 
