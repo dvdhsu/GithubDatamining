@@ -3,17 +3,19 @@
  * Describes the angular controllers/services and their dependencies
  */
 
-angular.module('githubviz', [
+var app =angular.module('githubviz', [
+    'ngRoute',
     'githubviz.controllers',
     'githubviz.services',
     'chartsExample.directives',
     'uiSlider',
-    'monospaced.mousewheel'
+    'monospaced.mousewheel',
 ]);
 
 
 angular.module('githubviz.controllers', [ 
-    'chart.js'
+    'chart.js',
+    'githubviz.services'
     //add dependencies for the controllers here
 ]);
 
@@ -21,6 +23,21 @@ angular.module('githubviz.services', [
     //add dependencies for the services here
 ]);
 
+app.config(['$routeProvider', function ($routeProvider) {
+    $routeProvider
+
+    //Home page
+    .when('/', {
+        templateUrl: 'app/home/main.html',
+    })
+
+    //top repos
+    .when('/toprepos', {
+        templateUrl: 'app/toprepos/main.html',
+        controller: 'TopReposCtrl'
+    })
+
+}]);
 /**
  * Controls the entire app. Named "GithubViz".
  */

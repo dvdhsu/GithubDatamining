@@ -1,58 +1,78 @@
 <html ng-app="githubviz">
-  <head>
-  <!-- JQUERY -->
-  <script src="bower_components/jquery/dist/jquery.min.js"></script>
+<head>
+    <!-- JQUERY -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
 
-  <!-- ANGULAR -->
-  <script src="bower_components/angular/angular.js"></script>
+    <!-- ANGULAR -->
+    <script src="bower_components/angular/angular.js"></script>
 
-  <!--ANGULAR CHARTS + CHARTS.JS-->
-  <script src="bower_components/Chart.js/Chart.js"></script>
-  <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
+    <!--ANGULAR CHARTS + CHARTS.JS-->
+    <script src="bower_components/Chart.js/Chart.js"></script>
+    <script src="bower_components/angular-chart.js/dist/angular-chart.js"></script>
+    <script src="d3.min.js"></script>
+    <script src="bower_components/hamsterjs/hamster.js"></script>
+    <script src="bower_components/angular-mousewheel/mousewheel.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
 
-  <script src="bower_components/hamsterjs/hamster.js"></script>
-  <script src="bower_components/angular-mousewheel/mousewheel.js"></script>
-  <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
-  <script src="angular-slider/angular-slider.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="angular-slider/angular-slider.css" />
-  <!-- MOMENT TIME LIBRARY -->
-  <script src="./bower_components/moment/moment.js"></script>
+    <script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-theme.css">
 
-  <!-- SOCKET.IO -->
-  <script src="/bower_components/socket.io-client/socket.io.js"></script>
+    <link rel="stylesheet" href="bower_components/angular-chart.js/dist/angular-chart.css">
+    <script src="angular-slider/angular-slider.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="angular-slider/angular-slider.css" />
+
+    <!-- MOMENT TIME LIBRARY -->
+    <script src="./bower_components/moment/moment.js"></script>
+
+    <!-- SOCKET.IO -->
+    <script src="/bower_components/socket.io-client/socket.io.js"></script>
 
 
-  <!--HIGHCHARTS -->
-  <script src="bower_components/highcharts-release/highcharts-all.js"></script>
-  <script src="./bower_components/angular-highcharts-directive/src/directives/highchart.js"></script>
+    <!--HIGHCHARTS -->
+    <script src="bower_components/highcharts-release/highcharts-all.js"></script>
+    <script src="./bower_components/angular-highcharts-directive/src/directives/highchart.js"></script>
 
-  <!-- MAIN APP -->
-  <script src="app.js"></script>
+    <!-- MAIN APP -->
+    <script src="app.js"></script>
 
-  <!-- UTILITY SCRIPTS -->
-  <script src="app/util/net/event_store_service.js"></script>
-  <script src="app/util/net/socketio.js"></script>
-  <script src="app/util/test/testController.js"></script>
+    <!-- UTILITY SCRIPTS -->
+    <script src="app/util/net/event_store_service.js"></script>
+    <script src="app/util/net/socketio.js"></script>
+    <script src="app/util/test/testController.js"></script>
 
-  <!--REALTIME CONTROLLER-->
-  <script src="app/realtime/service.js"></script>
-  <script src="app/realtime/ctrl.js"></script>
-  <!--TOPREPOS CONTROLLER-->
-  <script src="app/toprepos/ctrl.js"></script>
+    <!--REALTIME CONTROLLER-->
+    <script src="app/realtime/service.js"></script>
+    <script src="app/realtime/ctrl.js"></script>
+    <!--TOPREPOS CONTROLLER-->
+    <script src="app/toprepos/ctrl.js"></script>
 
-  <script src="app/util/ai/gng_module.js"></script>
+    <script src="app/util/ai/gng_module.js"></script>
 
-  </head>
-  <body ng-controller="GithubViz">
-    <h1> Github Visualizations </h1>
+</head>
+<body ng-controller="GithubViz">
     <!--<div ng-controller="RealTimeController"-->
-      <!--ng-include="'app/realtime/main.html'">-->
+    <!--ng-include="'app/realtime/main.html'">-->
     <!--</div>-->
     <!--<div ng-controller="TestController"-->
-      <!--ng-include="'app/util/test/main.html'">-->
+    <!--ng-include="'app/util/test/main.html'">-->
     <!--</div>-->
-    <div ng-controller="TopReposCtrl"
-      ng-include="'app/toprepos/main.html'">
+
+    <div class="navbar navbar-fixed-top" role="navigation" style="height: 60px">
+        <div class="container" style="height: 60px">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#/">Github Visualizations </a>
+            </div>
+            <div class="navbar-collapse collapse" style="height: 60px!important">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#/toprepos"><i class="fa fa-shield"></i> Top Repos </a>
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div><!--/.container -->
     </div>
-  </body>
+    <div ng-view></div>
+</body>
 </html>
