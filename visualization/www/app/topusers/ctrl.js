@@ -1,5 +1,5 @@
 ﻿(function () {
-    angular.module('githubviz.controllers').controller('TopReposCtrl', ['$scope', 'SocketIOService', 'GngClusterService', ctrl]);
+    angular.module('githubviz.controllers').controller('TopUsersCtrl', ['$scope', 'SocketIOService', 'GngClusterService', ctrl]);
     var BOUNDS = 40000;
     var iteration = 0;
     function ctrl($scope, SocketIOService, GngClusterService) {
@@ -10,6 +10,7 @@
             var other_repos = [];
             for (var i = 0; i != repo.links.length; ++i) {
                 var link = repo.links[i];
+                console.log('SDFSDFS')
                 if (link.repo_1 == repo) {
                     other_repos.push($scope.repos[link.repo_2]);
                 } else {
@@ -18,21 +19,24 @@
             }
             return other_repos;
         }
-        SocketIOService.AddHandler('toprepos', function (repos) {
-            console.log('got top repos');
-            console.log(repos);
-
+        SocketIOService.AddHandler('topusers', function (repos) {
             contrib_ids = {};
             $scope.repo_array = repos;
             $scope.repo_array.map(function (repo) {
                 repo.links = [];
-                $scope.repos[repo.full_name] = repo;
+                if (!repo.starred_repos) {
+                    return;
+                }
+                console.log(repo.starred_repos);
+                repo.links = [];
+                $scope.repos[repo.login] = repo;
                 $scope.repo_array.push(repo);
-                repo.contributors.map(function (cid) {
-                    if (!contrib_ids[cid]) {
-                        contrib_ids[cid] = [];
+                repo.links = [];
+                repo.starred_repos.map(function (obj) {
+                    if (!contrib_ids[obj.id]) {
+                        contrib_ids[obj.id] = [];
                     }
-                    contrib_ids[cid].push(repo);
+                    contrib_ids[obj.id].push(repo);
                 });
             });
 
@@ -40,17 +44,20 @@
                 var repos = contrib_ids[cid];
                 for (var i = 0; i < repos.length; ++i) {
                     for (var j = i + 1; j < repos.length; ++j) {
-                        repos[j].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
-                        repos[i].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
+                        if (!repos[j].links) {
+                            repos[j].links = [];
+                        }
+                        repos[j].links.push({ repo_1: repos[i].login, repo_2: repos[j].login, total_weight: 5 });
+                        if (!repos[i].links) {
+                            repos[i].links = [];
+                        }
+                        repos[i].links.push({ repo_1: repos[i].login, repo_2: repos[j].login, total_weight: 5 });
                     }
                 }
             }
             SetUpNetwork();
-            //$scope.canvas = document.getElementById('bigAwesomePlot');
-            //$scope.context = $scope.canvas.getContext('2d');
-            //$scope.initializeGraph();
         });
-        SocketIOService.Emit('toprepos');
+        SocketIOService.Emit('topusers');
         function SetUpNetwork() {
             var margin = { top: -5, right: -5, bottom: -5, left: -5 },
                 width = 1400 - margin.left - margin.right,
@@ -64,9 +71,9 @@
             var force = d3.layout.force()
                 .size([width, height])
                 .nodes([{}]) // initialize with a single node
-                .linkDistance(0)
+                .linkDistance(50)
                 .charge(-50)
-                .linkStrength(0.01)
+                .linkStrength(0.3)
                 .gravity(0.01)
                 .on("tick", tick);
 
@@ -116,8 +123,11 @@
                 d3.select(this).classed("dragging", false);
             }
             $scope.repo_array.map(function (repo) {
-                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name };
-                nodes.push(repo.node);
+                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.login };
+                //if (repo.subscriptions && repo.subscriptions.length > 0) {
+                //    nodes.push(repo.node);
+                //}
+                    nodes.push(repo.node);
             });
             $scope.repo_array.map(function (repo) {
                 var neighbors = GetNeighbors(repo);
@@ -149,7 +159,7 @@
                 var n = node.enter().append('g');
                 n.insert("circle", ".cursor")
                     .attr("class", "node")
-                    .attr("r", 3)
+                    .attr("r", 5)
                     .call(force.drag)
                     .append("text")
                     .attr("dx", 12)

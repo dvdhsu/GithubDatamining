@@ -37,6 +37,12 @@ app.config(['$routeProvider', function ($routeProvider) {
         controller: 'TopReposCtrl'
     })
 
+    //top repos
+    .when('/topusers', {
+            templateUrl: 'app/topusers/main.html',
+        controller: 'TopUsersCtrl'
+    })
+
 }]);
 /**
  * Controls the entire app. Named "GithubViz".

@@ -13,21 +13,42 @@ var MongoService = require('./app/mongodb/service.js');
 
 //var RealTime = require('./app/realtime/data.js');
 //RealTime.AddTickHandler(function(data){
-    ////broadcast the data to everybody
-    //io.emit('realtime_data', data)
+////broadcast the data to everybody
+//io.emit('realtime_data', data)
 //})
 
 console.log(io);
 
 //socket.io routing
-io.on('connection', function(socket){
+io.on('connection', function (socket) {
     console.log('a user connected');
     WebsocketHandler.HandleSocket(socket);
-    socket.on('toprepos', function(){
-      var promise = MongoService.GetAllRepos();
-      promise.success(function(docs){
-        socket.emit('toprepos', docs.slice(0,150));
-      });
+    socket.on('toprepos', function () {
+        console.log('toprepos asked for ');
+        var promise = MongoService.GetAllRepos();
+        promise.success(function (docs) {
+            socket.emit('toprepos', docs.slice(0, 200));
+        });
+    })
+    socket.on('topusers', function () {
+        console.log('topusers asked for ');
+        var promise = MongoService.GetAllUsers();
+        promise.success(function (docs) {
+            console.log('sending down the docs!');
+            console.log(docs[0]);
+            docs = docs.map(function(doc){
+              if (doc.starred_repos){
+                doc.starred_repos = doc.starred_repos.map(function(repo){
+                  return {id: repo.id}
+                });
+              }
+              return doc;
+            });
+            socket.emit('topusers', docs.slice(0,100));
+        });
+        promise.error(function (e){
+            console.log(e);
+        })
     })
 });
 
