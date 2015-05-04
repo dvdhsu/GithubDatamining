@@ -41,7 +41,7 @@
                 for (var i = 0; i < repos.length; ++i) {
                     for (var j = i + 1; j < repos.length; ++j) {
                         repos[j].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
-                        repos[i].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
+                        //repos[i].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
                     }
                 }
             }
@@ -64,7 +64,7 @@
             var force = d3.layout.force()
                 .size([width, height])
                 .nodes([{}]) // initialize with a single node
-                .linkDistance(0)
+                .linkDistance(30)
                 .charge(-50)
                 .linkStrength(0.01)
                 .gravity(0.01)
@@ -116,7 +116,7 @@
                 d3.select(this).classed("dragging", false);
             }
             $scope.repo_array.map(function (repo) {
-                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name };
+                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name, r : repo.watchers * 0.0005 };
                 nodes.push(repo.node);
             });
             $scope.repo_array.map(function (repo) {
@@ -149,7 +149,10 @@
                 var n = node.enter().append('g');
                 n.insert("circle", ".cursor")
                     .attr("class", "node")
-                    .attr("r", 3)
+                    .attr("r", function (d) {
+                        console.log(d);
+                        return d.r;
+                    })
                     .call(force.drag)
                     .append("text")
                     .attr("dx", 12)
@@ -159,7 +162,7 @@
                     });
 
                 n.append("text")
-                    .attr("dx", 12)
+                    .attr("dx", function (d) { return d.r + 5 })
                     .attr("dy", ".35em")
                     .text(function (d) {
                         return d.name;
