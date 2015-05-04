@@ -67,13 +67,16 @@
 
             var drag = d3.behavior.drag()
                 .origin(function (d) { return d; })
+                .on("dragstart", dragstarted)
+                .on("drag", dragged)
+                .on("dragend", dragended);
 
             var force = d3.layout.force()
                 .size([width, height])
                 .nodes([{}]) // initialize with a single node
                 .linkDistance(50)
-                .charge(-50)
-                .linkStrength(0.3)
+                .charge(-100)
+                .linkStrength(0.01)
                 .gravity(0.01)
                 .on("tick", tick);
 
@@ -96,34 +99,10 @@
                 links = force.links(),
                 node = svg.selectAll(".node"),
                 link = svg.selectAll(".link");
-            //var node = svg.selectAll(".node")
-            //      .data(force.nodes())
-            //      .enter().append("g")
 
 
-
-            function redraw() {
-                console.log('ZOOM')
-                svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-            }
-
-            function dragstarted(d) {
-                console.log('DRAG STARTING');
-                d3.event.sourceEvent.stopPropagation();
-                d3.select(this).classed("dragging", true);
-            }
-
-            function dragged(d) {
-                console.log('DRAGGED ');
-                d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-            }
-
-            function dragended(d) {
-                console.log('DRAG STARTING');
-                d3.select(this).classed("dragging", false);
-            }
             $scope.repo_array.map(function (repo) {
-                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.login };
+                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.login , r : Math.sqrt(repo.followers) * 0.5};
                 //if (repo.subscriptions && repo.subscriptions.length > 0) {
                 //    nodes.push(repo.node);
                 //}
@@ -137,6 +116,30 @@
                 })
             });
             restart();
+
+            function redraw() {
+                console.log('ZOOM')
+                svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            }
+
+            function dragstarted(d) {
+                console.log('DRAG STARTING');
+                force.start();
+                console.log('wattt');
+                d3.event.sourceEvent.stopPropagation();
+                d3.select(this).classed("dragging", true);
+            }
+
+            function dragged(d) {
+                console.log('DRAGGED ');
+                console
+                d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+            }
+
+            function dragended(d) {
+                console.log('DRAG STARTING');
+                d3.select(this).classed("dragging", false);
+            }
 
             function tick() {
                 link.attr("x1", function (d) { return d.source.x; })
@@ -156,24 +159,26 @@
                     .attr("class", "link");
 
                 node = node.data(nodes);
-                var n = node.enter().append('g');
+                var n = node.enter().append('g').call(drag);
                 n.insert("circle", ".cursor")
                     .attr("class", "node")
-                    .attr("r", 5)
-                    .call(force.drag)
-                    .append("text")
-                    .attr("dx", 12)
-                    .attr("dy", ".35em")
-                    .text(function (d) {
-                        return d.name;
-                    });
+                    .attr("r", function (d) {
+                        if (!d.r) {
+                            d.r = 3;
+                        }
+                        return d.r;
+                    })
 
                 n.append("text")
-                    .attr("dx", 12)
+                    .attr("dx", function (d) { return d.r + 5 })
                     .attr("dy", ".35em")
                     .text(function (d) {
                         return d.name;
                     });
+                if (d3.event && d3.event.keyCode) {
+                    d3.event.preventDefault();
+                    d3.event.stopPropagation();
+                }
                 force.start();
             }
 

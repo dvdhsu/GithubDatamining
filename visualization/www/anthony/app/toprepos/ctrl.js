@@ -41,7 +41,7 @@
                 for (var i = 0; i < repos.length; ++i) {
                     for (var j = i + 1; j < repos.length; ++j) {
                         repos[j].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
-                        repos[i].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
+                        //repos[i].links.push({ repo_1: repos[i].full_name, repo_2: repos[j].full_name, total_weight: 5 });
                     }
                 }
             }
@@ -60,11 +60,14 @@
 
             var drag = d3.behavior.drag()
                 .origin(function (d) { return d; })
+                .on("dragstart", dragstarted)
+                .on("drag", dragged)
+                .on("dragend", dragended);
 
             var force = d3.layout.force()
                 .size([width, height])
                 .nodes([{}]) // initialize with a single node
-                .linkDistance(0)
+                .linkDistance(30)
                 .charge(-50)
                 .linkStrength(0.01)
                 .gravity(0.01)
@@ -89,9 +92,19 @@
                 links = force.links(),
                 node = svg.selectAll(".node"),
                 link = svg.selectAll(".link");
-            //var node = svg.selectAll(".node")
-            //      .data(force.nodes())
-            //      .enter().append("g")
+
+            $scope.repo_array.map(function (repo) {
+                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name, r : repo.watchers * 0.0005 };
+                nodes.push(repo.node);
+            });
+            $scope.repo_array.map(function (repo) {
+                var neighbors = GetNeighbors(repo);
+
+                neighbors.map(function (neighbor) {
+                    links.push({ source: repo.node, target: neighbor.node })
+                })
+            });
+            restart();
 
 
 
@@ -102,6 +115,7 @@
 
             function dragstarted(d) {
                 console.log('DRAG STARTING');
+                force.start();
                 d3.event.sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
             }
@@ -115,19 +129,6 @@
                 console.log('DRAG STARTING');
                 d3.select(this).classed("dragging", false);
             }
-            $scope.repo_array.map(function (repo) {
-                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name };
-                nodes.push(repo.node);
-            });
-            $scope.repo_array.map(function (repo) {
-                var neighbors = GetNeighbors(repo);
-
-                neighbors.map(function (neighbor) {
-                    links.push({ source: repo.node, target: neighbor.node })
-                })
-            });
-            restart();
-
             function tick() {
                 link.attr("x1", function (d) { return d.source.x; })
                     .attr("y1", function (d) { return d.source.y; })
@@ -146,24 +147,26 @@
                     .attr("class", "link");
 
                 node = node.data(nodes);
-                var n = node.enter().append('g');
+                var n = node.enter().append('g').call(drag);
                 n.insert("circle", ".cursor")
                     .attr("class", "node")
-                    .attr("r", 3)
-                    .call(force.drag)
-                    .append("text")
-                    .attr("dx", 12)
-                    .attr("dy", ".35em")
-                    .text(function (d) {
-                        return d.name;
-                    });
+                    .attr("r", function (d) {
+                        if (!d.r) {
+                            d.r = 3;
+                        }
+                        return d.r;
+                    })
 
                 n.append("text")
-                    .attr("dx", 12)
+                    .attr("dx", function (d) { return d.r + 5 })
                     .attr("dy", ".35em")
                     .text(function (d) {
                         return d.name;
                     });
+                if (d3.event && d3.event.keyCode) {
+                    d3.event.preventDefault();
+                    d3.event.stopPropagation();
+                }
                 force.start();
             }
 

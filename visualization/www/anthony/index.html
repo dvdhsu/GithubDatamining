@@ -24,15 +24,15 @@
     <link rel="stylesheet" type="text/css" href="angular-slider/angular-slider.css" />
 
     <!-- MOMENT TIME LIBRARY -->
-    <script src="./bower_components/moment/moment.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
 
     <!-- SOCKET.IO -->
-    <script src="/bower_components/socket.io-client/socket.io.js"></script>
+    <script src="bower_components/socket.io-client/socket.io.js"></script>
 
 
     <!--HIGHCHARTS -->
     <script src="bower_components/highcharts-release/highcharts-all.js"></script>
-    <script src="./bower_components/angular-highcharts-directive/src/directives/highchart.js"></script>
+    <script src="bower_components/angular-highcharts-directive/src/directives/highchart.js"></script>
 
     <!-- MAIN APP -->
     <script src="app.js"></script>
@@ -49,6 +49,34 @@
 
     <script src="app/util/ai/gng_module.js"></script>
 
+    <style>
+        rect {
+            fill: none;
+            pointer-events: all;
+        }
+
+        .node {
+            fill: #1f7600;
+            /*opacity: 0.7;*/
+        }
+
+        .node text {
+            pointer-events: none;
+            font: 300px sans-serif;
+            font-weight:200;
+        }
+
+        .cursor {
+            fill: none;
+            stroke: brown;
+            pointer-events: none;
+        }
+
+        .link {
+            stroke: #1f7600;
+            width:0.1;
+        }
+    </style>
 </head>
 <body ng-controller="GithubViz">
     <!--<div ng-controller="RealTimeController"-->
@@ -64,7 +92,7 @@
                 <a class="navbar-brand" href="#/">Github Visualizations </a>
             </div>
             <div class="navbar-collapse collapse" style="height: 60px!important">
-                <ul class="nav navbar-nav navbar-right">
+                <ul class="nav navbar-nav navbar-right" style="height: 80px">
                     <li>
                         <a href="#/toprepos"><i class="fa fa-shield"></i> Top Repos </a>
                     </li>

@@ -44,7 +44,7 @@ io.on('connection', function (socket) {
               }
               return doc;
             });
-            socket.emit('topusers', docs.slice(0,100));
+            socket.emit('topusers', docs.slice(0,200));
         });
         promise.error(function (e){
             console.log(e);
