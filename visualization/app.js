@@ -53,7 +53,7 @@ io.on('connection', function (socket) {
 });
 
 //Serve static content from the  ./www directory
-app.use(express.static('www'))
+app.use("/anthony", express.static('www'))
 
 var server = http.listen(2000, function () {
     var host = server.address().address
