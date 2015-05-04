@@ -8,11 +8,11 @@ var db = monk('localhost:27017/github_db')
 
 function ProcessEvent(ev) {
     var events = db.get('events');
-    
+
     ev._id = parseInt(ev.id);
     //Mongo ids have specific types. Simplest solution is to convert the id to an integer
     //http://stackoverflow.com/questions/26453507/argument-passed-in-must-be-a-single-string-of-12-bytes
-    
+
     events.insert(ev, function (err, doc) {
         if (err) {
             console.log(err);
@@ -111,31 +111,58 @@ function UpdateUser(user){
     return users.update({ id: user.id }, user);
 }
 
+//stefan's mongodb functions
+
+function GetAllRandomUsers(){
+	var randusers = db.get('randusers');
+	return randusers.find({}, {});
+}
+
+function InsertRandomUser(user) {
+	var randusers = db.get('randusers');
+	randusers.insert(user, function (err, doc) {
+		if(err) {
+			console.log(err);
+		} else {
+			console.log('Added user successfully');
+		}
+	});
+}
+
+
+
 SetIndexes();
 
 module.exports = {
     //Processes an event and pushes it to our mongodb database
     ProcessEvent: ProcessEvent,
-    
+
     //Returns a promise object that can be iterated on for each event
     // using the syntax GetEventStream().each(function(...))
     GetEventStream: GetEventStream,
-    
+
     //Returns an object that iterates through pages of events
     GetEventPageIterator: GetEventPageIterator,
-    
+
     //Gets a repository
     GetRepo : GetRepo,
-    
+
     //Gets all the users
     GetAllUsers: GetAllUsers,
-    
-    UpdateUser: UpdateUser, 
+
+	//Gets all users from the random ones
+	GetAllRandomUsers: GetAllRandomUsers,
+
+    UpdateUser: UpdateUser,
     //Gets a list of repositories
     GetRepos: GetRepos,
-    
+
     //Inserts a repository into the repos database
     InsertRepo: InsertRepo,
     //Inserts a repository into the repos database
-    InsertUser: InsertUser
+    InsertUser: InsertUser,
+    //Inserts a random user and his data into the database
+    InsertRandomUser: InsertRandomUser
+
+
 }
