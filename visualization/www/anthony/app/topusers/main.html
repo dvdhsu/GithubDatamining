@@ -1,0 +1,73 @@
+<style>
+    rect {
+        fill: none;
+        pointer-events: all;
+    }
+
+    .node {
+        fill: #000;
+    }
+.node text {
+  pointer-events: none;
+  font: 10px sans-serif;
+}
+    .cursor {
+        fill: none;
+        stroke: brown;
+        pointer-events: none;
+    }
+
+    .link {
+        stroke: #999;
+    }
+</style>
+
+<style>
+    .horizontal_wide_box {
+        float: left;
+        margin: 5px, 30px, 5px, 30px;
+        width: 400px;
+    }
+
+    .horizontal_box {
+        float: left;
+        margin: 5px, 30px, 5px, 30px;
+        width: 100px;
+    }
+
+    .no_bullet {
+        list-style-type: none;
+        float: left;
+    }
+
+    slider {
+        width: 200px;
+    }
+
+    canvas {
+        margin-top: 20px;
+    }
+
+    td {
+        vertical-align: top;
+    }
+
+    ul {
+        height: 600px;
+        overflow: auto;
+    }
+</style>
+
+<div style="margin-top: 60px; margin-left: 60px">
+    <button ng-click="resume()">resume</button>
+    <button ng-click="stop()"> stop</button>
+    <button ng-click="reset()"> reset </button>
+    <button ng-click="startClustering()"> cluster it </button>
+    <h2> This is a force graph of the top 300 users in Github by followers</h2>
+    <h3> Each node is a user, and each edge between two nodes(users) means that both users subscribe to a common repo</h3>
+    <div id="svg_container">
+
+    </div>
+</div>
+<br />
+
