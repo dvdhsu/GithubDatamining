@@ -3,7 +3,7 @@
  * callbacks
  */
 
-
+var lineReader = require("line-reader");
 var http = require('http');
 var https = require('https');
 var github = require('octonode');
@@ -54,7 +54,7 @@ function StartPolling() {
                     }
                 });
             }
-            
+
             //We should use below...
             var next_poll_time = parseInt(headers['x-poll-interval']) * 1000;
             //But because we don't care about github's request to not poll so much
@@ -179,25 +179,105 @@ function GetTopRepos(cb) {
 
 }
 
+//Stefan's functions
+
+function getStars(username, cb){
+
+	console.log(username);
+
+	var stars = 0;
+	var repoCount = 0;
+	var repos = [];
+	var user  = {};
+
+
+	user['login'] = username;
+	user['repos'] = [];
+
+	client.get('/users/' + username + '/repos', {}, function (err, status, body, headers) {
+
+		for(i = 0; i < body.length; i++){
+
+			var repoData = {}
+
+			repoData['name'] = body[i].name;
+			repoData['star_count'] = body[i].stargazers_count;
+			repoData['watcher_count'] = body[i].watchers_count;
+			repoData['fork_count'] = body[i].forks_count;
+
+			user['repos'].push(repoData);
+			stars += body[i].stargazers_count;
+			repoCount += 1;
+
+		}
+		user['total_stars'] = stars;
+		user['total_repos'] = repoCount;
+		//console.log(user);
+		cb(user);
+		//console.log(myData);
+	});
+	//setTimeout(printJSON, 2000);
+}
+
+function contains(obj, array) {
+    var i;
+    for (i = 0; i < array.length; i++) {
+        if (array[i].login === obj.login) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+function GetRandomUsers(cb){
+
+	var arr = [];
+
+	lineReader.eachLine('./2015-03-05-2.json', function(line){
+
+		if(line != ''){
+
+			var data = JSON.parse(line);
+
+			data = data.actor;
+
+			if(!contains(data, arr)){
+
+				arr.push(data.login);
+				getStars(data.login, cb);
+
+			}
+		}
+	}).then(function(){return false; });
+}
+
+
+
+
 //log_state();
 module.exports = {
-    //Adds a callback that will be called whenever new data is received from github 
+    //Adds a callback that will be called whenever new data is received from github
     AddListener: AddListener,
-    
+
     //Starts polling github for data
     StartPolling : StartPolling,
-    
+
     //Gets a repository via the GitHub api
     GetRepo: GetRepo,
-    
+
     GetTopUsers: GetTopUsers,
-    
+
     GetTopRepos: GetTopRepos,
-    
+
     GetStarredRepo: GetStarredRepo,
     
     GetUserObject: GetUserObject,
     
     PollsRemaining: PollsRemaining
 
+    PollsRemaining: PollsRemaining,
+
+	GetRandomUsers: GetRandomUsers
 }
