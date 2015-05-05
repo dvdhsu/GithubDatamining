@@ -70,8 +70,8 @@ app.get('/toprepos', function (req, res) {
   });
 });
 app.get('/topusers', function (req, res) {
-  res.render('pages/toprepos', {
-    title: "Graph visualisation - Top Repositories"
+  res.render('pages/topusers', {
+    title: "Graph visualisation - Top Users"
   });
 });
 
