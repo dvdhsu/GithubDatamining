@@ -199,6 +199,11 @@
                 }
                 force.start();
             }
+            function constant(){
+              force.start();
+              setTimeout(constant, 1000);
+            }
+            constant();
 
         }
 

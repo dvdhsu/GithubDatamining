@@ -76,8 +76,8 @@
                 .nodes([]) // initialize with a single node
                 .linkDistance(10)
                 .charge(-150)
-                .linkStrength(0.005)
-                .gravity(0.001)
+                .linkStrength(0.015)
+                .gravity(0.002)
                 .on("tick", tick);
 
             var svg = d3.select("#svg_container").append("svg")
@@ -206,6 +206,11 @@
                 }
                 force.start();
             }
+            function constant(){
+              force.start();
+              setTimeout(constant, 1000);
+            }
+            constant();
 
         }
 
