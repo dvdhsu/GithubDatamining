@@ -42,7 +42,11 @@ io.on('connection', function (socket) {
                   return {id: repo.id}
                 });
               }
-              return doc;
+              return {
+                login: doc.login,
+                followers: doc.followers,
+                starred_repos: doc.starred_repos
+              }
             });
             socket.emit('topusers', docs.slice(0,200));
         });
