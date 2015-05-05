@@ -27,7 +27,6 @@
             $scope.repo_array.map(function (repo) {
                 repo.links = [];
                 $scope.repos[repo.full_name] = repo;
-                $scope.repo_array.push(repo);
                 repo.contributors.map(function (cid) {
                     if (!contrib_ids[cid]) {
                         contrib_ids[cid] = [];
@@ -68,7 +67,7 @@
                 .size([width, height])
                 .nodes([{}]) // initialize with a single node
                 .linkDistance(30)
-                .charge(-50)
+                .charge(-200)
                 .linkStrength(0.01)
                 .gravity(0.01)
                 .on("tick", tick);
@@ -93,12 +92,26 @@
                 node = svg.selectAll(".node"),
                 link = svg.selectAll(".link");
 
+            var max_radius = 0;
+            var min_radius = 100;
             $scope.repo_array.map(function (repo) {
-                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name, r : repo.watchers * 0.0005 };
+                //repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.name, r : (repo.watchers) * 0.0005};
+                repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.full_name, r : repo.watchers * 0.001 };
+                if (repo.node.r > max_radius) {
+                    max_radius = repo.node.r;
+                }
+                if (repo.node.r < min_radius) {
+                    min_radius = repo.node.r;
+                }
                 nodes.push(repo.node);
             });
             $scope.repo_array.map(function (repo) {
                 var neighbors = GetNeighbors(repo);
+                var r_percent = (repo.node.r - min_radius) / (max_radius - min_radius)
+                repo.node.red_value = Math.floor(255 * (Math.pow(0.1, r_percent) - 0.1));
+                repo.node.blue_level = 255 - repo.node.red_value;
+                repo.node.green_value = 0; //Math.floor(repo.node.red_value * (135/255));
+                console.log(repo.node);
 
                 neighbors.map(function (neighbor) {
                     links.push({ source: repo.node, target: neighbor.node })
@@ -114,10 +127,21 @@
             }
 
             function dragstarted(d) {
-                console.log('DRAG STARTING');
                 force.start();
                 d3.event.sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
+                d3.select(this).classed("selected", !d.selected);
+                d.selected = !d.selected;
+                console.log(d);
+                links.forEach(function (link) {
+                    if (link.source.name == d.name || link.target.name == d.name) {
+                        if (link.class) {
+                            link.class = null;
+                        } else {
+                            link.class = 'selected';
+                        }
+                    }
+                })
             }
 
             function dragged(d) {
@@ -133,7 +157,10 @@
                 link.attr("x1", function (d) { return d.source.x; })
                     .attr("y1", function (d) { return d.source.y; })
                     .attr("x2", function (d) { return d.target.x; })
-                    .attr("y2", function (d) { return d.target.y; });
+                    .attr("y2", function (d) { return d.target.y; })
+                    .attr("class", function (d) {
+                        return "link "+ d.class
+                    });
 
                 node.attr("cx", function (d) { return d.x; })
                     .attr("cy", function (d) { return d.y; });
@@ -150,6 +177,9 @@
                 var n = node.enter().append('g').call(drag);
                 n.insert("circle", ".cursor")
                     .attr("class", "node")
+                    .attr("style", function (d) {
+                        return "fill: rgb("+d.red_value+","+d.green_value+","+ d.blue_level+")";
+                    })
                     .attr("r", function (d) {
                         if (!d.r) {
                             d.r = 3;

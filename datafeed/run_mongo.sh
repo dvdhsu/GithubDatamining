@@ -1,1 +1,1 @@
-nohup mongod --dbpath ./data &
+nohup mongod --rest --dbpath ./data &
