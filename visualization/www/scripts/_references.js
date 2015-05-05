@@ -275,3 +275,4 @@
 /// <reference path="../anthony/bower_components/angular-bootstrap/ui-bootstrap.js" />
 /// <reference path="../anthony/bower_components/angular-bootstrap/ui-bootstrap-tpls.js" />
 /// <reference path="../anthony/bower_components/angular/index.js" />
+/// <reference path="iframeResizer.min.js" />
