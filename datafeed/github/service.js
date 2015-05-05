@@ -141,6 +141,15 @@ function GetStarredRepo(user, cb) {
     });
 }
 
+function GetUserObject(user, cb){
+    var user_url = user.url;
+    var start = user_url.indexOf('/users');
+    user_url = user_url.substr(start);
+    client.get(user_url, {}, function (err, status, body, headers){
+        cb(body);
+    })
+}
+
 function GetTopRepos(cb) {
     MIN_STARS = 500;
     var ghsearch = client.search();
@@ -186,6 +195,8 @@ module.exports = {
     GetTopRepos: GetTopRepos,
     
     GetStarredRepo: GetStarredRepo,
+    
+    GetUserObject: GetUserObject,
     
     PollsRemaining: PollsRemaining
 

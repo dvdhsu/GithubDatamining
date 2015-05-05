@@ -20,6 +20,7 @@
             return other_repos;
         }
         SocketIOService.AddHandler('topusers', function (repos) {
+            console.log(repos);
             contrib_ids = {};
             $scope.repo_array = repos;
             $scope.repo_array.map(function (repo) {
@@ -30,7 +31,6 @@
                 console.log(repo.starred_repos);
                 repo.links = [];
                 $scope.repos[repo.login] = repo;
-                $scope.repo_array.push(repo);
                 repo.links = [];
                 repo.starred_repos.map(function (obj) {
                     if (!contrib_ids[obj.id]) {
@@ -73,11 +73,11 @@
 
             var force = d3.layout.force()
                 .size([width, height])
-                .nodes([{}]) // initialize with a single node
-                .linkDistance(50)
-                .charge(-100)
-                .linkStrength(0.01)
-                .gravity(0.01)
+                .nodes([]) // initialize with a single node
+                .linkDistance(10)
+                .charge(-150)
+                .linkStrength(0.005)
+                .gravity(0.001)
                 .on("tick", tick);
 
             var svg = d3.select("#svg_container").append("svg")
@@ -101,16 +101,26 @@
                 link = svg.selectAll(".link");
 
 
+            var max_radius = 0;
+            var min_radius = 100;
             $scope.repo_array.map(function (repo) {
                 repo.node = { x: Math.random() * 300, y: Math.random() * 300, name: repo.login , r : Math.sqrt(repo.followers) * 0.5};
-                //if (repo.subscriptions && repo.subscriptions.length > 0) {
-                //    nodes.push(repo.node);
-                //}
-                    nodes.push(repo.node);
+                if (repo.node.r > max_radius) {
+                    max_radius = repo.node.r;
+                }
+                if (repo.node.r < min_radius) {
+                    min_radius = repo.node.r;
+                }
+                nodes.push(repo.node);
             });
+            console.log($scope.repo_array.length);
+            console.log(nodes.length);
             $scope.repo_array.map(function (repo) {
                 var neighbors = GetNeighbors(repo);
-
+                var c = Math.E - 1;
+                var r_percent = (repo.node.r - min_radius) / (max_radius - min_radius)
+                repo.node.red_value = Math.floor(255 * (Math.pow(0.1, r_percent) - 0.1));
+                repo.node.blue_level = 255 - repo.node.red_value;
                 neighbors.map(function (neighbor) {
                     links.push({ source: repo.node, target: neighbor.node })
                 })
@@ -123,16 +133,25 @@
             }
 
             function dragstarted(d) {
-                console.log('DRAG STARTING');
                 force.start();
-                console.log('wattt');
                 d3.event.sourceEvent.stopPropagation();
                 d3.select(this).classed("dragging", true);
+                d3.select(this).classed("selected", !d.selected);
+                d.selected = !d.selected;
+                console.log(d);
+                links.forEach(function (link) {
+                    if (link.source.name == d.name || link.target.name == d.name) {
+                        if (link.class) {
+                            link.class = null;
+                        } else {
+                            link.class = 'selected';
+                        }
+                    }
+                })
             }
 
             function dragged(d) {
                 console.log('DRAGGED ');
-                console
                 d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
             }
 
@@ -145,7 +164,10 @@
                 link.attr("x1", function (d) { return d.source.x; })
                     .attr("y1", function (d) { return d.source.y; })
                     .attr("x2", function (d) { return d.target.x; })
-                    .attr("y2", function (d) { return d.target.y; });
+                    .attr("y2", function (d) { return d.target.y; })
+                    .attr("class", function (d) {
+                        return "link "+ d.class
+                    });
 
                 node.attr("cx", function (d) { return d.x; })
                     .attr("cy", function (d) { return d.y; });
@@ -156,12 +178,15 @@
                 link = link.data(links);
 
                 link.enter().insert("line", ".node")
-                    .attr("class", "link");
+                    .attr("class", "link")
 
                 node = node.data(nodes);
                 var n = node.enter().append('g').call(drag);
                 n.insert("circle", ".cursor")
                     .attr("class", "node")
+                    .attr("style", function (d) {
+                        return "fill: rgb("+d.red_value+",0,"+ d.blue_level+")";
+                    })
                     .attr("r", function (d) {
                         if (!d.r) {
                             d.r = 3;
