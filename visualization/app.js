@@ -59,14 +59,19 @@ io.on('connection', function (socket) {
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 
-app.get('/visualisation', function (req, res) {
-  res.render('pages/visualisation', {
+app.get('/', function (req, res) {
+  res.render('pages/home', {
     title: "Graph visualisation"
   });
 });
-app.get('/forcegraph', function (req, res) {
-  res.render('pages/forcegraph', {
-    title: "Graph visualisation"
+app.get('/toprepos', function (req, res) {
+  res.render('pages/toprepos', {
+    title: "Graph visualisation - Top Repositories"
+  });
+});
+app.get('/topusers', function (req, res) {
+  res.render('pages/topusers', {
+    title: "Graph visualisation - Top Users"
   });
 });
 
