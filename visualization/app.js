@@ -52,14 +52,17 @@ io.on('connection', function (socket) {
     })
 });
 
-//Serve static content from the  ./www directory
-var url = require("url");
-app.get('/visualisation', function (req, res, next) {
-  var link = '../anthony';
-  var body = '<iframe frameborder="0" width="100%" height="100%" src="' + link + '" seamless></iframe>';
-  res.send(body);
+app.set('view engine', 'ejs');
+app.set('views', __dirname + '/views');
+
+app.get('/visualisation', function (req, res) {
+  res.render('pages/visualisation', {
+    title: "Graph visualisation"
+  });
 });
-app.use("/anthony", express.static('www/anthony'))
+
+//Serve static content from the  ./www directory
+app.use(express.static('www'))
 
 var server = http.listen(2000, function () {
     var host = server.address().address
