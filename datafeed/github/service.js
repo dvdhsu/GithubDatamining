@@ -275,8 +275,6 @@ module.exports = {
     
     GetUserObject: GetUserObject,
     
-    PollsRemaining: PollsRemaining
-
     PollsRemaining: PollsRemaining,
 
 	GetRandomUsers: GetRandomUsers
