@@ -60,6 +60,11 @@ app.get('/visualisation', function (req, res) {
     title: "Graph visualisation"
   });
 });
+app.get('/forcegraph', function (req, res) {
+  res.render('pages/forcegraph', {
+    title: "Graph visualisation"
+  });
+});
 
 //Serve static content from the  ./www directory
 app.use(express.static('www'))
